@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>劉家廚房 · 預約</title>
+<style>
+  :root{
+    --paper:#f6f1e5;
+    --card:#fffdf7;
+    --ink:#3a3226;
+    --muted:#8d7d63;
+    --gold:#b08d57;
+    --gold-deep:#8f6f3a;
+    --gold-soft:#faf3df;
+    --line:#e4d6b8;
+    --red:#9e3d2e;
+    --red-deep:#7e2f23;
+    --serif:"Songti SC","STSong","Noto Serif SC","SimSun",serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background-color:var(--paper);
+    background-image:radial-gradient(ellipse 90% 50% at 50% 0%, rgba(176,141,87,.20), rgba(176,141,87,0) 70%);
+    background-repeat:no-repeat;
+    min-height:100vh; line-height:1.6;
+  }
+  .page{max-width:640px; margin:0 auto; padding:26px 20px 64px;}
+
+  /* ---------- header ---------- */
+  header{text-align:center; padding:6px 0 2px;}
+  .hero{
+    display:block; width:100%; border-radius:18px;
+    border:1px solid rgba(176,141,87,.45);
+    box-shadow:0 10px 34px rgba(120,90,40,.28);
+  }
+  .brand{
+    font-family:var(--serif); font-weight:600;
+    font-size:46px; letter-spacing:18px; text-indent:18px;
+    margin:26px 0 4px; color:var(--ink);
+  }
+  .motto{
+    font-family:var(--serif); font-size:16px;
+    letter-spacing:12px; text-indent:12px; color:var(--gold-deep); margin-bottom:10px;
+  }
+  .sub{font-size:12px; letter-spacing:6px; text-indent:6px; color:var(--muted);}
+  .addr{margin:12px auto 0; font-size:13px; color:var(--muted); line-height:2; letter-spacing:1px;}
+  .divider{display:flex; align-items:center; gap:14px; margin:28px 0 22px;}
+  .divider::before,.divider::after{content:""; flex:1; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+  .divider span{font-family:var(--serif); color:var(--gold-deep); font-size:14px;
+    letter-spacing:8px; text-indent:8px; white-space:nowrap;}
+
+  /* ---------- sections ---------- */
+  .sec{
+    background:var(--card);
+    border:1px solid var(--line); border-radius:14px;
+    padding:24px 18px; margin:0 0 18px;
+    box-shadow:0 3px 14px rgba(150,120,70,.10);
+  }
+  .sec-title{
+    display:flex; align-items:center; gap:10px; margin:0 0 4px;
+    font-family:var(--serif); font-size:21px; letter-spacing:6px; color:var(--ink); font-weight:600;
+  }
+  .sec-title::before{
+    content:""; width:9px; height:26px; border-radius:2px; flex:none;
+    background:linear-gradient(180deg,var(--red),var(--red-deep));
+    box-shadow:0 1px 4px rgba(158,61,46,.35);
+  }
+  .hint{font-size:12px; color:var(--muted); margin:0 0 16px; letter-spacing:1px;}
+
+  /* ---------- option cards ---------- */
+  .cards{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
+  .card{position:relative; display:block; cursor:pointer;}
+  .card input{position:absolute; opacity:0; pointer-events:none;}
+  .card-body{
+    display:block; text-align:center; padding:22px 8px 20px;
+    border:1px solid var(--line); border-radius:12px;
+    background:linear-gradient(180deg,#fffefb,#fdf8ea);
+    box-shadow:0 2px 8px rgba(150,120,70,.08);
+    transition:all .18s ease;
+  }
+  .room-name{
+    font-family:var(--serif); font-size:23px; letter-spacing:10px; text-indent:10px;
+    color:var(--ink); transition:color .18s;
+  }
+  .room-sub{display:block; margin-top:6px; font-size:11px; letter-spacing:3px; color:var(--muted);}
+  .price-num{font-family:var(--serif); font-size:34px; color:var(--red); letter-spacing:2px; line-height:1.2;}
+  .price-unit{display:block; font-size:12px; color:var(--muted); margin-top:6px; letter-spacing:3px;}
+  .tick{
+    position:absolute; top:8px; right:10px; width:22px; height:22px; border-radius:50%;
+    background:var(--red); color:#fff; font-size:14px; line-height:22px; text-align:center;
+    opacity:0; transform:scale(.6); transition:all .18s;
+  }
+  .card input:checked + .card-body{
+    border-color:var(--gold);
+    background:linear-gradient(180deg,#fff9e6,#fbeed0);
+    box-shadow:0 0 0 1.5px var(--gold), 0 8px 20px rgba(176,141,87,.28);
+  }
+  .card input:checked + .card-body .room-name{color:var(--red);}
+  .card input:checked ~ .tick{opacity:1; transform:scale(1);}
+
+  /* ---------- form ---------- */
+  .field{margin:0 0 16px;}
+  .field > label{display:block; font-size:14px; margin-bottom:8px; letter-spacing:1px;}
+  .field > label i{font-style:normal; color:var(--red); margin-right:3px;}
+  .field input[type=text], .field input[type=tel], .field input[type=date],
+  .field input[type=time], .field textarea{
+    width:100%; padding:13px 14px; font-size:16px; border:1px solid var(--line);
+    border-radius:10px; background:#fff; color:var(--ink); font-family:inherit;
+  }
+  .field input::placeholder, .field textarea::placeholder{color:#b3a586;}
+  .field input:focus, .field textarea:focus{
+    outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(176,141,87,.18);
+  }
+  .field textarea{resize:vertical; min-height:80px;}
+  .field.invalid input, .field.invalid textarea{
+    border-color:#c0392b; box-shadow:0 0 0 3px rgba(192,57,43,.12);
+  }
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .chips{display:flex; gap:8px; margin-top:10px;}
+  .chip{border:1px solid var(--line); background:#fff; border-radius:20px;
+        padding:7px 16px; font-size:13px; color:var(--gold-deep); cursor:pointer; font-family:inherit;}
+  .chip:active{background:var(--gold-soft); border-color:var(--gold);}
+
+  .stepper{display:flex; align-items:center; border:1px solid var(--line);
+           border-radius:10px; overflow:hidden; background:#fff; width:max-content;}
+  .stepper button{width:54px; height:54px; border:0; background:var(--gold-soft);
+                  font-size:22px; color:var(--gold-deep); cursor:pointer; flex:none;}
+  .stepper button:active{background:#f3e6c8;}
+  .stepper input{
+    width:76px; text-align:center; border:0; background:transparent;
+    font-size:22px; font-family:var(--serif); color:var(--ink); padding:11px 0;
+    -moz-appearance:textfield; appearance:textfield;
+  }
+  .stepper input::-webkit-inner-spin-button,
+  .stepper input::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+  .stepper input:focus{outline:none;}
+  .stepper .unit{padding:0 16px 0 2px; font-size:15px; color:var(--muted);}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:block; width:100%; padding:16px; border:0; border-radius:12px; font-size:17px;
+    letter-spacing:8px; text-indent:8px; cursor:pointer; font-family:inherit; margin-top:8px;
+    font-weight:600;
+  }
+  .btn-primary{
+    background:linear-gradient(180deg,#b54632,#8c3325); color:#fdf6e8;
+    box-shadow:0 4px 16px rgba(158,61,46,.35);
+    font-family:var(--serif);
+  }
+  .btn-primary:active{transform:translateY(1px); box-shadow:0 2px 8px rgba(158,61,46,.3);}
+  .btn-ghost{background:#fff; color:var(--gold-deep); border:1px solid var(--gold);}
+  .btn-ghost:active{background:var(--gold-soft);}
+  .btn + .btn{margin-top:12px;}
+
+  /* ---------- result ---------- */
+  #result{display:none;}
+  #resultText{
+    width:100%; min-height:250px; padding:16px; font-size:15px; line-height:2;
+    border:1px dashed var(--gold); border-radius:10px; background:var(--gold-soft);
+    color:var(--ink); font-family:inherit; resize:vertical;
+  }
+  #imgWrap{display:none; text-align:center; margin-top:16px;}
+  #imgWrap img{max-width:100%; border:1px solid var(--line); border-radius:10px;
+               box-shadow:0 4px 18px rgba(150,120,70,.2);}
+  .img-tip{font-size:12px; color:var(--muted); margin-top:10px; letter-spacing:1px;}
+  #errBox{display:none; background:#fdeeee; border:1px solid #eec5bd;
+          color:#a93226; border-radius:10px; padding:12px 14px; font-size:14px; margin-bottom:16px;}
+  #errBox ul{margin:6px 0 0; padding-left:20px;}
+
+  /* ---------- 無JS提示（微信文件預覽時顯示） ---------- */
+  .noscript-banner{
+    background:#fdeeee; border:2px solid #9e3d2e; border-radius:12px;
+    padding:18px 16px; margin:0 0 18px; color:#7e2f23; font-size:15px; line-height:2;
+    text-align:center;
+  }
+  .noscript-banner b{font-size:17px; font-family:var(--serif);}
+
+  /* ---------- toast ---------- */
+  #toast{
+    position:fixed; left:50%; bottom:44px; transform:translateX(-50%) translateY(20px);
+    background:rgba(58,50,38,.95); color:#f6ecd4;
+    padding:13px 24px; border-radius:30px;
+    font-size:14px; opacity:0; pointer-events:none; transition:all .25s; z-index:99;
+    max-width:86vw; text-align:center; box-shadow:0 4px 18px rgba(0,0,0,.25);
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  footer{text-align:center; color:var(--muted); font-size:12px; margin-top:30px;
+         letter-spacing:5px; font-family:var(--serif);}
+</style>
+</head>
+<body>
+<noscript><div class="noscript-banner"><b>當前爲微信文件預覽，預約功能暫不可用</b><br>請點擊右上角「···」→「用其他應用打開」→<br>選擇 Safari / Chrome 瀏覽器打開填寫</div></noscript>
+<div class="page">
+
+  <header>
+    
+    <h1 class="brand">劉家廚房</h1>
+    <div class="motto">五味煮人生</div>
+    <div class="sub">私 房 菜 · 預 約 制</div>
+    <p class="addr">安徽省蕪湖市鏡湖區<br>世茂濱江花園4-1特色商業街B區155</p>
+  </header>
+
+  <div class="divider"><span>預 約 填 寫</span></div>
+
+  <!-- 預約信息 -->
+  <section class="sec">
+    <h2 class="sec-title">一、填寫預約信息</h2>
+    <div id="errBox"><b>還有幾項沒填好：</b><ul id="errList"></ul></div>
+
+    <div class="row2">
+      <div class="field" data-f="name">
+        <label><i>*</i>訂餐人姓名</label>
+        <input type="text" id="fName" autocomplete="off">
+      </div>
+      <div class="field" data-f="phone">
+        <label><i>*</i>聯繫電話</label>
+        <input type="tel" id="fPhone" inputmode="numeric" autocomplete="off">
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field" data-f="date">
+        <label><i>*</i>預訂日期</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="field" data-f="time">
+        <label><i>*</i>預訂時間</label>
+        <input type="time" id="fTime">
+      </div>
+    </div>
+    <div class="chips">
+      <button type="button" class="chip" data-t="11:30">午餐 11:30</button>
+      <button type="button" class="chip" data-t="17:30">晚餐 17:30</button>
+    </div>
+    <div style="height:16px"></div>
+
+    <div class="field" data-f="count">
+      <label><i>*</i>用餐人數</label>
+      <div class="stepper">
+        <button type="button" id="minusBtn">−</button>
+        <input type="number" id="countInput" value="8" min="1" max="60" inputmode="numeric">
+        <span class="unit">人</span>
+        <button type="button" id="plusBtn">＋</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>忌口</label>
+      <input type="text" id="fAvoid" placeholder="如：不喫蔥、蒜，或有過敏食物……沒有可不填" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label>備註</label>
+      <textarea id="fNote" placeholder="如有其他需求或安排，可以寫在備註中"></textarea>
+    </div>
+
+  </section>
+
+  <!-- 餐標 -->
+  <section class="sec">
+    <h2 class="sec-title">二、選擇餐標</h2>
+    <p class="hint">按每位計</p>
+    <div class="cards">
+      <label class="card"><input type="radio" name="price" value="168"><span class="card-body"><span class="price-num">168</span><span class="price-unit">元 / 位</span></span><span class="tick">✓</span></label>
+      <label class="card"><input type="radio" name="price" value="228"><span class="card-body"><span class="price-num">228</span><span class="price-unit">元 / 位</span></span><span class="tick">✓</span></label>
+      <label class="card"><input type="radio" name="price" value="298"><span class="card-body"><span class="price-num">298</span><span class="price-unit">元 / 位</span></span><span class="tick">✓</span></label>
+      <label class="card"><input type="radio" name="price" value="358"><span class="card-body"><span class="price-num">358</span><span class="price-unit">元 / 位</span></span><span class="tick">✓</span></label>
+    </div>
+  </section>
+
+  <button class="btn btn-primary" id="genBtn" type="button" style="margin:0 0 22px">生成預約信息</button>
+
+  <!-- 結果 -->
+  <section class="sec" id="result">
+    <h2 class="sec-title">預約信息已生成</h2>
+    <p class="hint">檢查一下，確認無誤後複製發送，或保存爲圖片</p>
+    <textarea id="resultText" readonly></textarea>
+    <button class="btn btn-primary" id="copyBtn" type="button">一鍵複製</button>
+    <button class="btn btn-ghost" id="imgBtn" type="button">生成圖片</button>
+    <div id="imgWrap">
+      <img id="imgPreview" alt="預約信息圖片">
+      <div style="margin-top:12px">
+        <a id="dlLink" class="btn btn-primary" style="text-decoration:none; display:block;" download="劉家廚房預約.png">保存圖片</a>
+      </div>
+      <p class="img-tip">手機上也可以長按圖片保存到相冊</p>
+    </div>
+  </section>
+
+  <footer>劉 家 廚 房 · 五 味 煮 人 生</footer>
+</div>
+
+<div id="toast"></div>
+<canvas id="card" width="1080" height="1560" style="display:none"></canvas>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* 日期最小值 = 今天 */
+  var today = new Date();
+  var tstr = today.getFullYear() + "-" +
+             String(today.getMonth()+1).padStart(2,"0") + "-" +
+             String(today.getDate()).padStart(2,"0");
+  $("fDate").min = tstr;
+
+  /* 人數：加減 + 直接輸入，默認 8 人 */
+  var countInput = $("countInput");
+  function getCount(){
+    var v = parseInt(countInput.value, 10);
+    if(isNaN(v)) v = 8;
+    v = Math.max(1, Math.min(60, Math.round(v)));
+    countInput.value = v;
+    return v;
+  }
+  $("minusBtn").onclick = function(){ countInput.value = getCount() - 1; getCount(); };
+  $("plusBtn").onclick  = function(){ countInput.value = getCount() + 1; getCount(); };
+  countInput.addEventListener("change", getCount);
+  countInput.addEventListener("blur", getCount);
+
+  /* 快捷時間 */
+  var chips = document.querySelectorAll(".chip");
+  for(var i=0;i<chips.length;i++){
+    chips[i].onclick = (function(el){
+      return function(){ $("fTime").value = el.getAttribute("data-t"); };
+    })(chips[i]);
+  }
+
+  function toast(msg){
+    var t = $("toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 2200);
+  }
+
+  function checkedVal(name){
+    var els = document.getElementsByName(name);
+    for(var i=0;i<els.length;i++){ if(els[i].checked) return els[i].value; }
+    return "";
+  }
+
+  function markInvalid(key, bad){
+    var f = document.querySelector('.field[data-f="'+key+'"]');
+    if(f) f.classList.toggle("invalid", bad);
+  }
+
+  function weekdayStr(ds){
+    var p = ds.split("-");
+    var d = new Date(+p[0], +p[1]-1, +p[2]);
+    return "週" + "日一二三四五六".charAt(d.getDay());
+  }
+  function dateStr(ds){
+    var p = ds.split("-");
+    return +p[0] + "年" + +p[1] + "月" + +p[2] + "日（" + weekdayStr(ds) + "）";
+  }
+
+  function collect(){
+    var errs = [];
+    var price = checkedVal("price");
+    var name  = $("fName").value.trim();
+    var phone = $("fPhone").value.trim();
+    var date  = $("fDate").value;
+    var time  = $("fTime").value;
+    var avoid = $("fAvoid").value.trim() || "無";
+    var note  = $("fNote").value.trim()  || "無";
+
+    markInvalid("name", false); markInvalid("phone", false);
+    markInvalid("date", false); markInvalid("time", false);
+
+    if(!price) errs.push("請選擇餐標");
+    if(!name){ errs.push("請填寫訂餐人姓名"); markInvalid("name", true); }
+    if(!/^1[3-9]\d{9}$/.test(phone)){ errs.push("請填寫正確的11位手機號"); markInvalid("phone", true); }
+    if(!date){ errs.push("請選擇預訂日期"); markInvalid("date", true); }
+    if(!time){ errs.push("請選擇預訂時間"); markInvalid("time", true); }
+
+    return { errs:errs, data:{
+      price:price, name:name, phone:phone,
+      date:date, time:time, count:getCount(), avoid:avoid, note:note
+    }};
+  }
+
+  function buildText(d){
+    var L = [];
+    L.push("劉家廚房 · 預約信息");
+    L.push("———————————");
+    L.push("姓名：" + d.name);
+    L.push("電話：" + d.phone);
+    L.push("日期：" + dateStr(d.date));
+    L.push("時間：" + d.time);
+    L.push("人數：" + d.count + "人");
+    L.push("餐標：" + d.price + "元/位");
+    L.push("忌口：" + d.avoid);
+    L.push("備註：" + d.note);
+    L.push("———————————");
+    return L.join("\n");
+  }
+
+  $("genBtn").onclick = function(){
+    var r = collect();
+    var box = $("errBox"), list = $("errList");
+    if(r.errs.length){
+      list.innerHTML = "";
+      r.errs.forEach(function(e){
+        var li = document.createElement("li"); li.textContent = e; list.appendChild(li);
+      });
+      box.style.display = "block";
+      box.scrollIntoView({behavior:"smooth", block:"center"});
+      return;
+    }
+    box.style.display = "none";
+    $("resultText").value = buildText(r.data);
+    $("imgWrap").style.display = "none";
+    var sec = $("result");
+    sec.style.display = "block";
+    sec.scrollIntoView({behavior:"smooth", block:"start"});
+    window._booking = r.data;
+  };
+
+  $("copyBtn").onclick = function(){
+    var t = $("resultText").value;
+    if(!t){ toast("請先生成預約信息"); return; }
+    function done(ok){ toast(ok ? "已複製，去微信粘貼發給我們吧" : "複製失敗，請手動長按複製"); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){ done(true); }, function(){
+        fallbackCopy(t, done);
+      });
+    }else{
+      fallbackCopy(t, done);
+    }
+  };
+  function fallbackCopy(t, done){
+    var ta = document.createElement("textarea");
+    ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try{ ok = document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+    if(!ok){ $("resultText").select(); }
+    done(ok);
+  }
+
+  /* ---------- 生成圖片 ---------- */
+  function wrapText(ctx, text, maxW){
+    var lines = [], line = "";
+    for(var i=0;i<text.length;i++){
+      var test = line + text[i];
+      if(ctx.measureText(test).width > maxW && line){
+        lines.push(line); line = text[i];
+      }else{ line = test; }
+    }
+    if(line) lines.push(line);
+    return lines;
+  }
+  function roundClip(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+    ctx.clip();
+  }
+
+  function renderCard(d){
+    var cv = $("card"), ctx = cv.getContext("2d");
+    var W = 1080;
+    var SERIF = '"Songti SC","STSong","SimSun",serif';
+
+    var rows = [
+      ["姓 名", d.name],
+      ["電 話", d.phone],
+      ["日 期", dateStr(d.date)],
+      ["時 間", d.time],
+      ["人 數", d.count + "人"],
+      ["餐 標", d.price + "元/位"],
+      ["忌 口", d.avoid],
+      ["備 注", d.note]
+    ];
+
+    /* 先量每行需要的高度，再定畫布總高 */
+    ctx.font = '600 38px ' + SERIF;
+    var rowInfos = rows.map(function(r){
+      var lines = wrapText(ctx, String(r[1]), 560);
+      return { label:r[0], lines:lines, h:104 + (lines.length-1)*54 };
+    });
+    var H = 380 + rowInfos.reduce(function(a,b){ return a + b.h; }, 0) + 300;
+    cv.width = W; cv.height = H;
+
+    /* 紙底 */
+    ctx.fillStyle = "#f8f3e6"; ctx.fillRect(0,0,W,H);
+    var glow = ctx.createRadialGradient(W/2, 0, 60, W/2, 0, 700);
+    glow.addColorStop(0, "rgba(176,141,87,.16)");
+    glow.addColorStop(1, "rgba(176,141,87,0)");
+    ctx.fillStyle = glow; ctx.fillRect(0,0,W,700);
+
+    /* 雙線框 */
+    ctx.strokeStyle = "#b08d57"; ctx.lineWidth = 6;
+    ctx.strokeRect(30,30,W-60,H-60);
+    ctx.lineWidth = 2; ctx.strokeStyle = "rgba(176,141,87,.55)";
+    ctx.strokeRect(52,52,W-104,H-104);
+
+    /* 標題 */
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#3a3226";
+    ctx.font = '600 76px ' + SERIF;
+    ctx.fillText("劉家廚房", W/2, 168);
+    ctx.fillStyle = "#8f6f3a";
+    ctx.font = '42px ' + SERIF;
+    ctx.fillText("預 約 信 息", W/2, 234);
+    ctx.strokeStyle = "rgba(176,141,87,.5)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(300, 272); ctx.lineTo(W-300, 272); ctx.stroke();
+
+    /* 行 */
+    var y = 364;
+    ctx.textAlign = "left";
+    rowInfos.forEach(function(r){
+      ctx.fillStyle = "#8d7d63"; ctx.font = '34px ' + SERIF;
+      ctx.fillText(r.label, 140, y);
+      ctx.fillStyle = "#3a3226"; ctx.font = '600 38px ' + SERIF;
+      ctx.fillText(r.lines[0], 350, y);
+      for(var k=1;k<r.lines.length;k++){ y += 54; ctx.fillText(r.lines[k], 350, y); }
+      y += 104;
+      ctx.strokeStyle = "rgba(176,141,87,.35)"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(140, y-54); ctx.lineTo(W-140, y-54); ctx.stroke();
+    });
+
+    /* 頁腳 */
+    ctx.textAlign = "center"; ctx.fillStyle = "#8d7d63";
+    ctx.font = '30px ' + SERIF;
+    ctx.fillText("安徽省蕪湖市鏡湖區", W/2, H-200);
+    ctx.fillText("世茂濱江花園4-1特色商業街B區155", W/2, H-150);
+    ctx.fillStyle = "#9e3d2e";
+    ctx.font = '600 34px ' + SERIF;
+    ctx.fillText("預 約 制 · 恭 候 光 臨", W/2, H-88);
+
+    var url = cv.toDataURL("image/png");
+    $("imgPreview").src = url;
+    var dl = $("dlLink");
+    dl.href = url;
+    dl.download = "劉家廚房預約_" + d.date + ".png";
+    $("imgWrap").style.display = "block";
+    $("imgWrap").scrollIntoView({behavior:"smooth", block:"center"});
+    toast("圖片已生成，可保存或長按保存");
+  }
+
+  $("imgBtn").onclick = function(){
+    var d = window._booking;
+    if(!d){ toast("請先生成預約信息"); return; }
+    renderCard(d);
+  };
+})();
+</script>
+</body>
+</html>
