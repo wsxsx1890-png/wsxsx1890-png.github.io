@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>劉家廚房 · 邀請函生成（內部）</title>
+<style>
+:root{
+--ink:#4a3f30; --gold:#b08d57; --gold-deep:#8a6d3f; --gold-soft:#f7f1e3;
+--paper:#fbf7ee; --line:#e5d9bd; --red:#a83a2e;
+}
+*{margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+body{
+font-family:-apple-system, "PingFang TC", "PingFang HK", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+background:var(--paper); color:var(--ink); line-height:1.7; padding-bottom:60px;
+background-image:radial-gradient(ellipse 90% 50% at 50% 0%, rgba(176,141,87,.20), rgba(176,141,87,0) 70%);
+background-repeat:no-repeat;
+}
+.wrap{max-width:560px; margin:0 auto; padding:0 20px;}
+header{text-align:center; padding:38px 0 10px;}
+header h1{font-family:"Songti TC","STSong","SimSun",serif; font-size:44px; letter-spacing:14px; color:var(--ink); font-weight:600;}
+header.tagline{font-family:"Songti TC","STSong",serif; font-size:17px; letter-spacing:6px; color:var(--gold-deep); margin-top:10px;}
+header.internal{
+display:inline-block; margin-top:12px; padding:4px 14px; font-size:13px; letter-spacing:2px;
+color:var(--red); border:1px solid var(--red); border-radius:20px;
+}
+.sec{background:#fff; border:1px solid var(--line); border-radius:14px; padding:22px 20px; margin-top:20px; box-shadow:0 2px 12px rgba(138,109,63,.06);}
+.sec-title{font-family:"Songti TC","STSong",serif; font-size:20px; color:var(--ink); margin-bottom:6px; padding-left:12px; border-left:3px solid var(--gold);}
+.hint{font-size:13px; color:#9a8a6d; margin-bottom:14px;}
+.field{margin-bottom:16px;}
+.field label{display:block; font-size:15px; font-weight:600; margin-bottom:8px;}
+.field textarea{
+width:100%; min-height:180px; padding:14px; font-size:15px; line-height:1.8;
+border:1px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);
+font-family:inherit; resize:vertical;
+}
+.field textarea::placeholder{color:#b3a586;}
+.btn{
+display:block; width:100%; padding:15px; font-size:17px; font-weight:600; letter-spacing:3px;
+border:none; border-radius:12px; cursor:pointer; font-family:inherit; margin-top:6px;
+}
+.btn-primary{background:linear-gradient(135deg, var(--gold) 0%, var(--gold-deep) 100%); color:#fff;}
+.btn-primary:active{opacity:.88;}
+.btn-ghost{background:#fff; color:var(--gold-deep); border:1.5px solid var(--gold);}
+.btn-ghost:active{background:var(--gold-soft);}
+.err{
+display:none; margin-top:12px; padding:12px 14px; font-size:14px; color:var(--red);
+background:#fdf0ee; border:1px solid #e8b4ad; border-radius:10px; line-height:1.8;
+}
+.parsed{
+display:none; margin-top:14px; padding:14px 16px; font-size:15px; line-height:2;
+background:var(--gold-soft); border:1px dashed var(--gold); border-radius:10px;
+}
+.parsed b{color:var(--gold-deep);}
+.rooms{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px;}
+.room{
+padding:14px 8px; text-align:center; font-size:16px; font-weight:600; letter-spacing:2px;
+border:1.5px solid var(--line); border-radius:10px; background:#fff; cursor:pointer;
+font-family:"Songti TC","STSong",serif;
+}
+.room.sel{border-color:var(--gold); background:var(--gold-soft); color:var(--gold-deep); box-shadow:0 0 0 1px var(--gold);}
+#invText{
+width:100%; min-height:300px; padding:16px; font-size:15px; line-height:2;
+border:1px dashed var(--gold); border-radius:10px; background:var(--gold-soft);
+color:var(--ink); font-family:inherit; resize:vertical; margin-bottom:6px;
+}
+.divider{display:flex; align-items:center; margin:22px 0 6px; color:var(--gold-deep); font-size:14px; letter-spacing:4px;}
+.divider::before,.divider::after{content:""; flex:1; height:1px; background:var(--line);}
+.divider span{padding:0 12px;}
+#toast{
+position:fixed; left:50%; bottom:80px; transform:translateX(-50%) translateY(20px);
+background:rgba(74,63,48,.92); color:#fff; font-size:14px; padding:12px 22px;
+border-radius:30px; opacity:0; pointer-events:none; transition:all.3s; z-index:99;
+max-width:86%; text-align:center;
+}
+#toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+.noscript-banner{
+display:none; margin:16px 0 0; padding:14px 16px; font-size:14px; line-height:1.9;
+color:#fff; background:var(--red); border-radius:10px;
+}
+</style>
+</head>
+<body>
+<noscript><div class="wrap"><div class="noscript-banner" style="display:block">當前爲微信文件預覽，功能暫不可用<br>請點擊右上角「···」→「用其他應用打開」→ 選擇瀏覽器打開</div></div></noscript>
+
+<div class="wrap">
+<header>
+<h1>劉家廚房</h1>
+<p class="tagline">五味煮人生</p>
+<br><span class="internal">內 部 工 具 · 請 勿 外 傳</span>
+</header>
+
+<!-- 一、粘貼 -->
+<section class="sec" id="step1">
+<h2 class="sec-title">一、粘貼客人的預約信息</h2>
+<p class="hint">把客人發來的全文複製粘貼到下面，自動識別姓名、日期、時間</p>
+<div class="field">
+<textarea id="pasteBox" placeholder="例如：&#10;劉家廚房 · 預約信息&#10;———————————&#10;姓名：王小明&#10;電話：13800001111&#10;日期：2026年10月25日（週六）&#10;時間：17:30&#10;人數：8人&#10;餐標：228元/位&#10;……"></textarea>
+</div>
+<button class="btn btn-primary" id="parseBtn" type="button">識別信息</button>
+<div class="err" id="parseErr"></div>
+<div class="parsed" id="parsedBox"></div>
+</section>
+
+<!-- 二、選包廂 -->
+<section class="sec" id="step2" style="display:none">
+<h2 class="sec-title">二、選擇包廂</h2>
+<p class="hint">包廂由店內安排，點選後生成邀請函</p>
+<div class="rooms" id="roomGrid">
+<div class="room" data-room="石頭路">石頭路</div>
+<div class="room" data-room="寶塔根">寶塔根</div>
+<div class="room" data-room="江夏里">江夏里</div>
+<div class="room" data-room="進寶街">進寶街</div>
+<div class="room" data-room="接官廳">接官廳</div>
+</div>
+<button class="btn btn-primary" id="genBtn" type="button">生成邀請函</button>
+<div class="err" id="roomErr"></div>
+</section>
+
+<!-- 三、結果 -->
+<section class="sec" id="result" style="display:none">
+<h2 class="sec-title">邀請函已生成</h2>
+<p class="hint">檢查無誤後複製，發回給訂餐人轉發</p>
+<textarea id="invText" readonly></textarea>
+<button class="btn btn-primary" id="copyBtn" type="button">一鍵複製</button>
+</section>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+function $(id){ return document.getElementById(id);}
+var toastTimer = null;
+function toast(msg){
+var t = $("toast"); t.textContent = msg; t.classList.add("show");
+if(toastTimer) clearTimeout(toastTimer);
+toastTimer = setTimeout(function(){ t.classList.remove("show");}, 2200);
+}
+function fallbackCopy(text, done){
+var ta = document.createElement("textarea");
+ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+document.body.appendChild(ta); ta.select();
+var ok = false;
+try{ ok = document.execCommand("copy");}catch(e){ ok = false;}
+document.body.removeChild(ta); done(ok);
+}
+
+var booking = null; // {name, date, time}
+var selRoom = "";
+
+function parseBooking(text){
+var d = {}, m;
+m = text.match(/(?:姓名|訂餐人)[：:]\s*([^\n\r]+)/); if(m) d.name = m[1].trim();
+m = text.match(/(?:日期|預訂日期)[：:]\s*([^\n\r]+)/); if(m) d.date = m[1].trim();
+m = text.match(/(?:時間|預訂時間)[：:]\s*([^\n\r]+)/); if(m) d.time = m[1].trim();
+m = text.match(/(?:電話|聯繫電話|手機)[：:]\s*([^\n\r]+)/); if(m) d.phone = m[1].trim();
+m = text.match(/(?:人數|用餐人數)[：:]\s*([^\n\r]+)/); if(m) d.people = m[1].trim();
+return d;
+}
+
+$("parseBtn").onclick = function(){
+var text = $("pasteBox").value.trim();
+$("parseErr").style.display = "none";
+if(!text){ showErr("請先粘貼客人的預約信息"); return;}
+var d = parseBooking(text);
+var missing = [];
+if(!d.name) missing.push("姓名");
+if(!d.date) missing.push("日期");
+if(!d.time) missing.push("時間");
+if(missing.length){
+showErr("未能識別出：" + missing.join("、") + "，請檢查粘貼的內容是否完整");
+$("parsedBox").style.display = "none";
+$("step2").style.display = "none";
+return;
+}
+booking = d;
+var html = "已識別：<b>" + esc(d.name) + "</b>　" + esc(d.date) + "　" + esc(d.time);
+if(d.phone) html += "<br>電話：" + esc(d.phone);
+if(d.people) html += "　人數：" + esc(d.people);
+$("parsedBox").innerHTML = html;
+$("parsedBox").style.display = "block";
+$("step2").style.display = "block";
+$("result").style.display = "none";
+$("step2").scrollIntoView({behavior:"smooth", block:"start"});
+};
+function showErr(msg){
+var e = $("parseErr"); e.textContent = msg; e.style.display = "block";
+}
+function esc(s){
+return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+var rooms = $("roomGrid").querySelectorAll(".room");
+for(var i = 0; i < rooms.length; i++){
+rooms[i].onclick = (function(el){
+return function(){
+for(var j = 0; j < rooms.length; j++) rooms[j].classList.remove("sel");
+el.classList.add("sel");
+selRoom = el.getAttribute("data-room");
+$("roomErr").style.display = "none";
+};
+})(rooms[i]);
+}
+
+function buildInvite(d, room){
+var L = [];
+L.push("邀請函");
+L.push("");
+L.push("人生幸事，八九不離食。");
+L.push("劉家廚房包廂已備好，");
+L.push("誠邀您撥冗出席，共享一席美味。");
+L.push("");
+L.push("包廂｜" + room);
+L.push("時間｜" + d.date + " " + d.time);
+L.push("地點｜蕪湖市鏡湖區世茂濱江花園4-1特色商業街");
+L.push("　　　B區155 · 劉家廚房");
+L.push("");
+L.push("—— " + d.name);
+return L.join("\n");
+}
+
+$("genBtn").onclick = function(){
+if(!booking){ toast("請先識別預約信息"); return;}
+if(!selRoom){
+var e = $("roomErr"); e.textContent = "請先選擇包廂"; e.style.display = "block";
+return;
+}
+$("invText").value = buildInvite(booking, selRoom);
+$("result").style.display = "block";
+$("result").scrollIntoView({behavior:"smooth", block:"start"});
+};
+
+$("copyBtn").onclick = function(){
+var t = $("invText").value;
+if(!t){ toast("請先生成邀請函"); return;}
+function done(ok){ toast(ok? "已複製，發回給訂餐人吧": "複製失敗，請手動長按複製");}
+if(navigator.clipboard && navigator.clipboard.writeText){
+navigator.clipboard.writeText(t).then(function(){ done(true);}, function(){ fallbackCopy(t, done);});
+}else{
+fallbackCopy(t, done);
+}
+};
+})();
+</script>
+</body>
+</html>
